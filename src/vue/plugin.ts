@@ -51,9 +51,9 @@ export const FineMqPlugin = {
     })
 
     // remove this in the next major version to support vue3
-    app.prototype.$fineMq = fineMq
+    // app.prototype.$fineMq = fineMq
 
     // uncomment this in the next major version to support vue3
-    // app.config.globalProperties.$fineMq = fineMq
+    app.config.globalProperties.$fineMq = fineMq
   },
 }
