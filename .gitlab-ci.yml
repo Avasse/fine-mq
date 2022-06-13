@@ -1,0 +1,36 @@
+image: node:9.6.1
+
+stages:
+  - build
+  - deploy
+
+cache:
+  key: "$CI_PROJECT_ID-$CI_COMMIT_REF_NAME"
+  paths:
+    - node_modules/
+
+npm_build:
+  stage: build
+  tags:
+    - smart-runner
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    name: "$CI_PROJECT_ID-$CI_COMMIT_REF_NAME-$CI_COMMIT_TAG"
+    when: on_success
+    paths:
+      - build/
+    expire_in: '1 hour'
+
+# Publish tagged versions to npm
+publish:
+  stage: deploy
+  tags:
+    - smart-runner
+  script:
+    - echo '//nexus3.dev.fr.auchan.com/repository/npm_id/:_authToken=${NPM_TOKEN}'> ~/.npmrc
+    - npm publish
+  only:
+    - master
+  when: manual

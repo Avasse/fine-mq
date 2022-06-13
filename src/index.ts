@@ -1,2 +1,3 @@
+export { VueMqPlugin } from './vue/plugin'
 export * from './lib/fine-mq'
-export { FineMqPlugin } from './vue/plugin'
+export { useVueMq, useVueMqAliases } from "./vue/composables"

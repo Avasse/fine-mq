@@ -1,22 +1,77 @@
-# fine-mq
+# vue-mq
 
-> A fine API to use media queries in JS with ease and with first-class integration with Vue.js/Nuxt.js.
-
-Read the doc [here](https://nash403.github.io/fine-mq/).
+> A fine API to use media queries in JS with ease and with first-class integration with Vue.js version 3.
 
 ```sh
-# Install using NPM or Yarn:
-npm i --save fine-mq
-# or
-yarn add fine-mq
+# Install using NPM :
+npm i --save @smartapp/vue-mq
 ```
 
 ## Usage
 
-### In JS
+### As a Vue plugin
+
+Import plugin
 
 ```js
-import { createFineMediaQueries }  from 'fine-mq'
+import { VueMqPlugin } from '@smartapp/vue-mq'
+
+
+// Define your aliases as plugin options (defaults to `{ sm: 680, md: [681, 1024], lg: [1025] }` for Vue.js only, not the JS API)
+app.use(VueMqPlugin, {
+  aliases: {
+    sm: 680, // <=> [0, 680], can also be a size in px, em or rem
+    md: [681, 1024],
+    lg: [1025], // <=> [1025, Infinity]
+    landscape: '(orientation: landscape)',
+    an_alias_name: {
+      screen: true,
+      minWidth: '23em',
+      maxWidth: '768px'
+    },
+    print: { print: true }
+  },
+  // Define the default values for your matching aliases for SSR
+  defaultMatchedMediaQueries: {
+    sm: false,
+    md: false,
+    lg: true,
+  }
+})
+
+// Two reactive properties will then be provided on Vue instances:
+// - `$mq` is an object that contains the matching state for each alias in the form { [alias]: true/false }.
+// - `$vueMq` is a VueMq instance for advanced usages.
+```
+
+Component Template
+
+```html
+<navbar v-if="$mq.aliases.desktop" />
+<topbar v-else-if="$mq.aliases.tablet" />
+<print v-else-if="$mq.aliases.print" />
+```
+
+Composition API 
+
+```js
+const mq = inject('mq')
+
+// and/or
+
+const vueMq = inject('vueMq')
+
+// and/or 
+
+import { usevueMq } from '@smartapp/vue-mq'
+
+const vueMq = usevueMq()
+```
+
+### As plain JS
+
+```js
+import { createFineMediaQueries }  from '@smartapp/vue-mq'
 
 const mq = createFineMediaQueries({
   // Fine Mq supports modifiers for sizes shortcuts  (see below for examples)
@@ -69,71 +124,6 @@ _**NOTE 1:**_ Absurd modifiers will not be created for  (ex: when the lower boun
 _**NOTE 2:**_ If you specify the unit for your size (`px`, `em`, `rem`), the `+ 1` operation will not be performed for modifiers.
 
 See [FineMq](#finemq-api) for details about the API.
-
-### As a Vue plugin
-
-```js
-import { FineMqPlugin } from 'fine-mq'
-
-
-// Define your aliases as plugin options (defaults to `{ sm: 680, md: [681, 1024], lg: [1025] }` for Vue.js only, not the JS API)
-Vue.use(FineMqPlugin, {
-  aliases: {
-    sm: 680, // <=> [0, 680], can also be a size in px, em or rem
-    md: [681, 1024],
-    lg: [1025], // <=> [1025, Infinity]
-    landscape: '(orientation: landscape)',
-    an_alias_name: {
-      screen: true,
-      minWidth: '23em',
-      maxWidth: '768px'
-    }
-  }
-  // Define the default values for your matching aliases for SSR
-  defaultMatchedMediaQueries: {
-    sm: false,
-    md: false,
-    lg: true,
-  }
-})
-
-// Three reactive properties will then be available on Vue instances:
-// - `$mq` is an object that contains the matching state for each alias in the form { [alias]: true/false }.
-// - `$lastActiveAlias` will contain the last alias that was matched and triggered by the listener.
-// - `$fineMq` is a FineMq instance for advanced usages.
-```
-
-### With Nuxt.js
-
-```js
-// In your nuxt.config.js
-export default {
-  // ...
-  
-  // Build Configuration (https://go.nuxtjs.dev/config-build)
-  build: {
-    transpile: ['fine-mq'],
-  },
-  
-  modules: ['fine-mq/nuxt'],
-
-  // Pass options here
-  fineMq: {
-    defaultMatchingAliases: {
-      md: true,
-    },
-    aliases: {
-      sm: 640,
-      md: [641, 768],
-      lg: [769, 1024],
-      xl: [1025, 1280],
-      '2xl': [1281],
-    },
-  },
-
-  // ...
-}
-```
 
 ## FineMq API
 
@@ -203,16 +193,7 @@ Paul Irish: [matchMedia polyfill](https://github.com/paulirish/matchMedia.js)
 
 This package is highly inspired by the work made on other packages (links below), I just shamelessly copied their work and combined them !
 
+- [fine-mq](https://nash403.github.io/fine-mq/) by @nash403
 - [media-query-facade](https://github.com/tanem/media-query-facade) by @tanem
 - [vue-mq](https://github.com/AlexandreBonaventure/vue-mq/) by @AlexandreBonaventure
 - [json2mq](https://github.com/akiran/json2mq) by @akiran
-
-## Contributing
-
-Please [open an issue](https://github.com/nash403/fine-mq/issues/new) for support. Thanks in advance for any kind of contribution !
-
-1. Fork it!
-2. Create your feature branch: git checkout -b my-new-feature
-3. Commit your changes: git commit -am 'Add some feature'
-4. Push to the branch: git push origin my-new-feature
-5. Submit a pull request :D
